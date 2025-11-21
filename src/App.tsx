@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonReactRouter } from '@ionic/react-router';
+import { Redirect, Route } from 'react-router-dom';
 
-function App() {
-  const [count, setCount] = useState(0)
+/* Theme variables */
+import './App.css';
 
+setupIonicReact();
+
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route exact path="/">
+            <Redirect to="/menu" />
+          </Route>
+          <Route exact path="/menu">
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <h1>Menu Page</h1>
+              <p>Menu will be implemented here</p>
+            </div>
+          </Route>
+          <Route exact path="/cart">
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <h1>Cart Page</h1>
+              <p>Cart will be implemented here</p>
+            </div>
+          </Route>
+          <Route exact path="/checkout">
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <h1>Checkout Page</h1>
+              <p>Checkout will be implemented here</p>
+            </div>
+          </Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
-export default App
+export default App;

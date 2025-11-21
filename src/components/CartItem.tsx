@@ -122,26 +122,26 @@ export const CartItem: React.FC<CartItemProps> = ({ item }) => {
             }}>
               {item.name}
             </h3>
-            {item.addOns.length > 0 && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.25rem',
-                fontSize: '0.75rem',
-                color: '#666',
-                margin: '0 0 0.5rem 0'
-              }}>
-                <span>Add-ons: {item.addOns.map((addOn) => addOn.name).join(', ')}</span>
-                <IonButton
-                  fill="clear"
-                  size="small"
-                  onClick={handleEdit}
-                  style={{ '--padding-start': '4px', '--padding-end': '4px', height: '20px', margin: '0' }}
-                >
-                  <IonIcon icon={pencil} slot="icon-only" style={{ fontSize: '0.875rem' }} />
-                </IonButton>
-              </div>
-            )}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              fontSize: '0.75rem',
+              color: '#666',
+              margin: '0 0 0.5rem 0'
+            }}>
+              <span>
+                Add-ons: {item.addOns.length > 0 ? item.addOns.map((addOn) => addOn.name).join(', ') : 'None'}
+              </span>
+              <IonButton
+                fill="clear"
+                size="small"
+                onClick={handleEdit}
+                style={{ '--padding-start': '4px', '--padding-end': '4px', height: '20px', margin: '0' }}
+              >
+                <IonIcon icon={pencil} slot="icon-only" style={{ fontSize: '0.875rem' }} />
+              </IonButton>
+            </div>
           </div>
 
           <div style={{

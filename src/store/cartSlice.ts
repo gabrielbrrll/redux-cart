@@ -11,6 +11,29 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
+    /**
+     * Cart Item Duplication Strategy:
+     *
+     * Items are considered duplicates ONLY if both the base item AND add-ons are identical.
+     * Each unique combination of (item + add-ons) is treated as a separate cart entry.
+     *
+     * Examples:
+     * - "Burger" with no add-ons → cartItemId: "1-"
+     * - "Burger" with Gift Wrap → cartItemId: "1-gift-wrap"
+     * - "Burger" with Gift Wrap + Express Ship → cartItemId: "1-express-ship,gift-wrap" (sorted)
+     *
+     * When adding an item:
+     * 1. Generate cartItemId from item.id + sorted add-on IDs
+     * 2. Check if this exact combination exists in cart
+     * 3. If exists → increment quantity
+     * 4. If not → create new cart entry
+     *
+     * Rationale:
+     * - Users may want the same product with different customizations
+     * - Each unique combination should be clearly visible in the cart
+     * - Add-on IDs are sorted to ensure "A+B" and "B+A" generate the same ID
+     * - Simpler UX than nesting add-ons within a single grouped item
+     */
     addItem: (state, action: PayloadAction<{ item: MenuItem; addOns: AddOn[] }>) => {
       const { item, addOns } = action.payload;
       const cartItemId = generateCartItemId(item, addOns);

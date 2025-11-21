@@ -13,6 +13,7 @@ describe('menuSlice', () => {
     error: null,
     searchQuery: '',
     sortBy: 'name',
+    categoryFilter: []
   };
 
   it('should handle setSearchQuery', () => {

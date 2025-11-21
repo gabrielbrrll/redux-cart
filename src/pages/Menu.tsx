@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   IonPage,
   IonHeader,
@@ -23,10 +23,11 @@ import { SearchBar } from '../components/SearchBar';
 
 export const MenuPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { loading, error, sortBy, categoryFilter } = useAppSelector((state) => state.menu);
+  const { loading, error, sortBy, categoryFilter, searchQuery } = useAppSelector((state) => state.menu);
   const filteredItems = useAppSelector(selectFilteredAndSortedItems);
   const categories = useAppSelector(selectUniqueCategories);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const contentRef = useRef<HTMLIonContentElement>(null);
 
   useEffect(() => {
     dispatch(fetchMenu());
@@ -37,6 +38,10 @@ export const MenuPage: React.FC = () => {
       dispatch(setCategoryFilter(categories));
     }
   }, [categories, categoryFilter.length, dispatch]);
+
+  useEffect(() => {
+    contentRef.current?.scrollToTop(300);
+  }, [searchQuery, sortBy, categoryFilter]);
 
   if (loading) {
     return (
@@ -102,8 +107,16 @@ export const MenuPage: React.FC = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
-        <SearchBar />
+      <IonContent ref={contentRef}>
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          background: 'var(--ion-background-color, #fff)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          <SearchBar />
+        </div>
 
         {filteredItems.length === 0 ? (
           <div className="ion-padding ion-text-center" style={{ marginTop: '2rem' }}>

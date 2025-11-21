@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import menuReducer, { setSearchQuery, setSortBy } from '../menuSlice';
-import { MenuState } from '../../types';
+import type { MenuState } from '../../types';
 
 describe('menuSlice', () => {
   const initialState: MenuState = {

@@ -1,8 +1,8 @@
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
+import { MenuPage } from './pages/Menu';
 
-/* Theme variables */
 import './App.css';
 
 setupIonicReact();
@@ -16,10 +16,7 @@ const App: React.FC = () => {
             <Redirect to="/menu" />
           </Route>
           <Route exact path="/menu">
-            <div style={{ padding: '20px', textAlign: 'center' }}>
-              <h1>Menu Page</h1>
-              <p>Menu will be implemented here</p>
-            </div>
+            <MenuPage />
           </Route>
           <Route exact path="/cart">
             <div style={{ padding: '20px', textAlign: 'center' }}>

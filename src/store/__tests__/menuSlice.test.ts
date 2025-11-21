@@ -32,7 +32,8 @@ describe('menuSlice', () => {
       loading: false,
       error: null,
       searchQuery: '',
-      sortBy: 'name',
+      sortBy: 'name-asc',
+      categoryFilter: [],
     });
   });
 });

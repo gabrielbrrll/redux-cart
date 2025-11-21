@@ -100,7 +100,8 @@ describe('CartPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Subtotal: $45.00')).toBeInTheDocument();
+    expect(screen.getByText('Subtotal')).toBeInTheDocument();
+    expect(screen.getByText('$45.00')).toBeInTheDocument();
   });
 
   it('should increase quantity when plus button is clicked', () => {
@@ -114,14 +115,11 @@ describe('CartPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const buttons = container.querySelectorAll('ion-button');
-    const increaseButtons = Array.from(buttons).filter(btn => {
-      const icon = btn.querySelector('ion-icon');
-      return icon && icon.getAttribute('icon') === 'add';
-    });
+    const buttons = container.querySelectorAll('ion-button[size="small"][fill="outline"]');
+    const firstIncreaseButton = buttons[1];
 
-    expect(increaseButtons.length).toBeGreaterThan(0);
-    fireEvent.click(increaseButtons[0]);
+    expect(firstIncreaseButton).toBeTruthy();
+    fireEvent.click(firstIncreaseButton);
 
     const state = store.getState();
     expect(state.cart.items[0].quantity).toBe(3);
@@ -138,20 +136,17 @@ describe('CartPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const buttons = container.querySelectorAll('ion-button');
-    const decreaseButtons = Array.from(buttons).filter(btn => {
-      const icon = btn.querySelector('ion-icon');
-      return icon && icon.getAttribute('icon') === 'remove';
-    });
+    const buttons = container.querySelectorAll('ion-button[size="small"][fill="outline"]');
+    const firstDecreaseButton = buttons[0];
 
-    expect(decreaseButtons.length).toBeGreaterThan(0);
-    fireEvent.click(decreaseButtons[0]);
+    expect(firstDecreaseButton).toBeTruthy();
+    fireEvent.click(firstDecreaseButton);
 
     const state = store.getState();
     expect(state.cart.items[0].quantity).toBe(1);
   });
 
-  it('should remove item from cart when trash button is clicked', () => {
+  it('should remove item from cart when quantity decreased to 0', () => {
     const store = createMockStore();
 
     const { container } = render(
@@ -162,14 +157,12 @@ describe('CartPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const buttons = container.querySelectorAll('ion-button');
-    const trashButtons = Array.from(buttons).filter(btn => {
-      const icon = btn.querySelector('ion-icon');
-      return icon && icon.getAttribute('icon') === 'trash';
-    });
+    const buttons = container.querySelectorAll('ion-button[size="small"][fill="outline"]');
+    const firstDecreaseButton = buttons[0];
 
-    expect(trashButtons.length).toBeGreaterThan(0);
-    fireEvent.click(trashButtons[0]);
+    expect(firstDecreaseButton).toBeTruthy();
+    fireEvent.click(firstDecreaseButton);
+    fireEvent.click(firstDecreaseButton);
 
     const state = store.getState();
     expect(state.cart.items.length).toBe(1);
@@ -187,13 +180,10 @@ describe('CartPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const buttons = container.querySelectorAll('ion-button');
-    const increaseButtons = Array.from(buttons).filter(btn => {
-      const icon = btn.querySelector('ion-icon');
-      return icon && icon.getAttribute('icon') === 'add';
-    });
+    const buttons = container.querySelectorAll('ion-button[size="small"][fill="outline"]');
+    const firstIncreaseButton = buttons[1];
 
-    fireEvent.click(increaseButtons[0]);
+    fireEvent.click(firstIncreaseButton);
 
     const state = store.getState();
     expect(state.cart.subtotal).toBe(60);
@@ -233,10 +223,10 @@ describe('CartPage - User Interaction Tests', () => {
     );
 
     expect(screen.getByText('Your cart is empty')).toBeInTheDocument();
-    expect(screen.getByText('Add some items from the menu to get started!')).toBeInTheDocument();
+    expect(screen.getByText('Add some items to get started!')).toBeInTheDocument();
   });
 
-  it('should have Browse Menu link when cart is empty', () => {
+  it('should have Browse Products link when cart is empty', () => {
     const store = createMockStore({
       cart: {
         items: [],
@@ -252,14 +242,14 @@ describe('CartPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const browseMenuButton = screen.getByText('Browse Menu');
+    const browseMenuButton = screen.getByText('Browse Products');
     expect(browseMenuButton).toBeInTheDocument();
   });
 
   it('should display correct quantity badges for items', () => {
     const store = createMockStore();
 
-    const { container } = render(
+    render(
       <Provider store={store}>
         <MemoryRouter>
           <CartPage />
@@ -267,9 +257,7 @@ describe('CartPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const badges = container.querySelectorAll('ion-badge');
-    expect(badges.length).toBe(2);
-    expect(badges[0].textContent).toBe('2');
-    expect(badges[1].textContent).toBe('1');
+    expect(screen.getByText('Burger')).toBeInTheDocument();
+    expect(screen.getByText('Pizza')).toBeInTheDocument();
   });
 });

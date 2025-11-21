@@ -41,7 +41,8 @@ export interface MenuState {
   loading: boolean;
   error: string | null;
   searchQuery: string;
-  sortBy: 'name' | 'price' | 'category';
+  sortBy: string;
+  categoryFilter: string[];
 }
 
 /**
@@ -61,6 +62,7 @@ export interface Receipt {
   serviceCharge: number;
   total: number;
   timestamp: string;
+  orderId: string;
 }
 
 /**

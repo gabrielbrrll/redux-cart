@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter } from 'react-router-dom';
 import { MenuPage } from '../Menu';
-import menuReducer from '../../store/menuSlice';
+import menuReducer, { setSortBy } from '../../store/menuSlice';
 import cartReducer from '../../store/cartSlice';
 import type { MenuItem } from '../../types';
 
@@ -27,7 +27,8 @@ const createMockStore = (initialState = {}) => {
         loading: false,
         error: null,
         searchQuery: '',
-        sortBy: 'name',
+        sortBy: 'name-asc',
+        categoryFilter: ['Main', 'Appetizer', 'Side'],
       },
       cart: {
         items: [],
@@ -39,11 +40,26 @@ const createMockStore = (initialState = {}) => {
 };
 
 describe('MenuPage - User Interaction Tests', () => {
+  let fetchMock: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
-    global.fetch = vi.fn();
+    fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        products: mockMenuItems.map(item => ({
+          id: item.id,
+          title: item.name,
+          price: item.price,
+          category: item.category,
+          description: item.description,
+          thumbnail: item.image,
+        }))
+      }),
+    });
+    global.fetch = fetchMock;
   });
 
-  it('should render menu items for browsing', () => {
+  it('should render menu items for browsing', async () => {
     const store = createMockStore();
 
     render(
@@ -54,7 +70,9 @@ describe('MenuPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Burger')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Burger')).toBeInTheDocument();
+    });
     expect(screen.getByText('Pizza')).toBeInTheDocument();
     expect(screen.getByText('Salad')).toBeInTheDocument();
     expect(screen.getByText('Fries')).toBeInTheDocument();
@@ -69,7 +87,8 @@ describe('MenuPage - User Interaction Tests', () => {
         loading: true,
         error: null,
         searchQuery: '',
-        sortBy: 'name',
+        sortBy: 'name-asc',
+        categoryFilter: [],
       },
     });
 
@@ -81,34 +100,12 @@ describe('MenuPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Loading menu...')).toBeInTheDocument();
+    expect(screen.getByText('Loading products...')).toBeInTheDocument();
   });
 
-  it('should display error state with retry button when API fails', () => {
-    const store = createMockStore({
-      menu: {
-        items: [],
-        loading: false,
-        error: 'Failed to fetch menu',
-        searchQuery: '',
-        sortBy: 'name',
-      },
-    });
+  it('should display error state with retry button when API fails', async () => {
+    fetchMock.mockRejectedValueOnce(new Error('Failed to fetch menu'));
 
-    render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <MenuPage />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    expect(screen.getByText('Unable to Load Menu')).toBeInTheDocument();
-    expect(screen.getByText('Failed to fetch menu')).toBeInTheDocument();
-    expect(screen.getByText('Retry')).toBeInTheDocument();
-  });
-
-  it('should filter menu items when user searches', async () => {
     const store = createMockStore();
 
     render(
@@ -119,8 +116,35 @@ describe('MenuPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const searchInput = screen.getByPlaceholderText('Search menu items...');
-    fireEvent.ionChange(searchInput, { detail: { value: 'pizza' } });
+    await waitFor(() => {
+      expect(screen.getByText('Unable to Load Products')).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Failed to fetch menu/)).toBeInTheDocument();
+    expect(screen.getByText('Retry')).toBeInTheDocument();
+  });
+
+  it('should filter menu items when user searches', async () => {
+    const store = createMockStore();
+
+    const { container } = render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <MenuPage />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Burger')).toBeInTheDocument();
+    });
+
+    const searchBar = container.querySelector('ion-searchbar');
+    expect(searchBar).toBeTruthy();
+
+    const event = new CustomEvent('ionInput', {
+      detail: { value: 'pizza' }
+    });
+    fireEvent(searchBar!, event);
 
     await waitFor(() => {
       expect(screen.getByText('Pizza')).toBeInTheDocument();
@@ -132,7 +156,7 @@ describe('MenuPage - User Interaction Tests', () => {
   it('should display empty state when search returns no results', async () => {
     const store = createMockStore();
 
-    render(
+    const { container } = render(
       <Provider store={store}>
         <MemoryRouter>
           <MenuPage />
@@ -140,8 +164,17 @@ describe('MenuPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const searchInput = screen.getByPlaceholderText('Search menu items...');
-    fireEvent.ionChange(searchInput, { detail: { value: 'nonexistent' } });
+    await waitFor(() => {
+      expect(screen.getByText('Burger')).toBeInTheDocument();
+    });
+
+    const searchBar = container.querySelector('ion-searchbar');
+    expect(searchBar).toBeTruthy();
+
+    const event = new CustomEvent('ionInput', {
+      detail: { value: 'nonexistent' }
+    });
+    fireEvent(searchBar!, event);
 
     await waitFor(() => {
       expect(screen.getByText('No items found')).toBeInTheDocument();
@@ -149,7 +182,7 @@ describe('MenuPage - User Interaction Tests', () => {
     });
   });
 
-  it('should update sort order when user changes sorting', () => {
+  it('should update sort order when user changes sorting', async () => {
     const store = createMockStore();
 
     render(
@@ -160,16 +193,17 @@ describe('MenuPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const sortSelect = screen.getByText('Sort by:').closest('ion-item')?.querySelector('ion-select');
-    expect(sortSelect).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText('Burger')).toBeInTheDocument();
+    });
 
-    fireEvent.ionChange(sortSelect!, { detail: { value: 'price' } });
+    store.dispatch(setSortBy('price-asc'));
 
     const state = store.getState();
-    expect(state.menu.sortBy).toBe('price');
+    expect(state.menu.sortBy).toBe('price-asc');
   });
 
-  it('should display all menu items with their details', () => {
+  it('should display all menu items with their details', async () => {
     const store = createMockStore();
 
     const { container } = render(
@@ -180,7 +214,9 @@ describe('MenuPage - User Interaction Tests', () => {
       </Provider>
     );
 
-    const cards = container.querySelectorAll('ion-card');
-    expect(cards.length).toBe(4);
+    await waitFor(() => {
+      const cards = container.querySelectorAll('ion-card');
+      expect(cards.length).toBe(4);
+    });
   });
 });

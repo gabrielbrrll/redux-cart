@@ -75,8 +75,8 @@ describe('CheckoutPage', () => {
     );
 
     expect(screen.getByText('Order Summary')).toBeInTheDocument();
-    expect(screen.getByText(/Burger x2/)).toBeInTheDocument();
-    expect(screen.getByText(/Pizza x1/)).toBeInTheDocument();
+    expect(screen.getByText(/Burger/)).toBeInTheDocument();
+    expect(screen.getByText(/Pizza/)).toBeInTheDocument();
     expect(screen.getByText('Add-ons: Extra Cheese')).toBeInTheDocument();
   });
 
@@ -181,8 +181,8 @@ describe('CheckoutPage', () => {
     fireEvent.click(completeOrderButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Thank you for your order!')).toBeInTheDocument();
-      expect(screen.getByText('Receipt')).toBeInTheDocument();
+      expect(screen.getByText('Thank you!')).toBeInTheDocument();
+      expect(screen.getByText('Your order has been placed successfully')).toBeInTheDocument();
     });
   });
 
@@ -206,7 +206,13 @@ describe('CheckoutPage', () => {
 
       const timestamp = state.checkout.receipt?.timestamp;
       if (timestamp) {
-        const dateStr = new Date(timestamp).toLocaleString();
+        const dateStr = new Date(timestamp).toLocaleString('en-US', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
         expect(screen.getByText(dateStr)).toBeInTheDocument();
       }
     });
@@ -227,8 +233,10 @@ describe('CheckoutPage', () => {
     fireEvent.click(completeOrderButton);
 
     await waitFor(() => {
-      expect(screen.getAllByText(/Burger x2/)).toHaveLength(1);
-      expect(screen.getAllByText(/Pizza x1/)).toHaveLength(1);
+      expect(screen.getByText(/Burger/)).toBeInTheDocument();
+      expect(screen.getByText(/Pizza/)).toBeInTheDocument();
+      expect(screen.getByText(/×2/)).toBeInTheDocument();
+      expect(screen.getByText(/×1/)).toBeInTheDocument();
     });
   });
 

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { MenuItem, MenuState } from '../types';
 
@@ -66,8 +66,9 @@ const initialState: MenuState = {
   items: [],
   loading: false,
   error: null,
-  searchQuery: '', // Note: Could use local state; kept in Redux per assignment requirements
-  sortBy: 'name', // Note: Could use local state; kept in Redux per assignment requirements
+  searchQuery: '',
+  sortBy: 'name-asc',
+  categoryFilter: [],
 };
 
 const menuSlice = createSlice({
@@ -77,8 +78,20 @@ const menuSlice = createSlice({
     setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     },
-    setSortBy: (state, action: PayloadAction<'name' | 'price' | 'category'>) => {
+    setSortBy: (state, action: PayloadAction<string>) => {
       state.sortBy = action.payload;
+    },
+    setCategoryFilter: (state, action: PayloadAction<string[]>) => {
+      state.categoryFilter = action.payload;
+    },
+    toggleCategory: (state, action: PayloadAction<string>) => {
+      const category = action.payload;
+      const index = state.categoryFilter.indexOf(category);
+      if (index > -1) {
+        state.categoryFilter.splice(index, 1);
+      } else {
+        state.categoryFilter.push(category);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -99,36 +112,55 @@ const menuSlice = createSlice({
   },
 });
 
-export const { setSearchQuery, setSortBy } = menuSlice.actions;
+export const { setSearchQuery, setSortBy, setCategoryFilter, toggleCategory } = menuSlice.actions;
 export default menuSlice.reducer;
 
-export const selectFilteredAndSortedItems = (state: { menu: MenuState }) => {
-  const { items, searchQuery, sortBy } = state.menu;
+export const selectFilteredAndSortedItems = createSelector(
+  [(state: { menu: MenuState }) => state.menu],
+  (menu) => {
+    const { items, searchQuery, sortBy, categoryFilter } = menu;
 
-  let filtered = items;
+    let filtered = items;
 
-  if (searchQuery) {
-    const query = searchQuery.toLowerCase();
-    filtered = items.filter(
-      (item) =>
-        item.name.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query) ||
-        item.price.toString().includes(query)
-    );
-  }
-
-  const sorted = [...filtered].sort((a, b) => {
-    switch (sortBy) {
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'price':
-        return a.price - b.price;
-      case 'category':
-        return a.category.localeCompare(b.category);
-      default:
-        return 0;
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (item) =>
+          item.name.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query) ||
+          item.price.toString().includes(query)
+      );
     }
-  });
 
-  return sorted;
-};
+    if (categoryFilter && categoryFilter.length > 0) {
+      filtered = filtered.filter((item) => categoryFilter.includes(item.category));
+    }
+
+    return [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'category-asc':
+          return a.category.localeCompare(b.category);
+        case 'category-desc':
+          return b.category.localeCompare(a.category);
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        default:
+          return 0;
+      }
+    });
+  }
+);
+
+export const selectUniqueCategories = createSelector(
+  [(state: { menu: MenuState }) => state.menu.items],
+  (items) => {
+    const categories = items.map((item) => item.category);
+    return Array.from(new Set(categories)).sort();
+  }
+);

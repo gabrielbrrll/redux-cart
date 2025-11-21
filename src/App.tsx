@@ -10,8 +10,9 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
-import { restaurant, cart, checkmarkCircle } from 'ionicons/icons';
+import { cube, cart, checkmarkCircle } from 'ionicons/icons';
 import { MenuPage } from './pages/Menu';
+import { ProductDetail } from './pages/ProductDetail';
 import { CartPage } from './pages/Cart';
 import { CheckoutPage } from './pages/Checkout';
 
@@ -31,6 +32,9 @@ const App: React.FC = () => {
             <Route exact path="/menu">
               <MenuPage />
             </Route>
+            <Route exact path="/menu/:id">
+              <ProductDetail />
+            </Route>
             <Route exact path="/cart">
               <CartPage />
             </Route>
@@ -41,8 +45,8 @@ const App: React.FC = () => {
 
           <IonTabBar slot="bottom">
             <IonTabButton tab="menu" href="/menu">
-              <IonIcon icon={restaurant} />
-              <IonLabel>Menu</IonLabel>
+              <IonIcon icon={cube} />
+              <IonLabel>Products</IonLabel>
             </IonTabButton>
 
             <IonTabButton tab="cart" href="/cart">

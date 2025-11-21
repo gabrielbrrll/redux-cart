@@ -59,6 +59,35 @@ const cartSlice = createSlice({
       state.items = [];
       state.subtotal = 0;
     },
+
+    updateItem: (
+      state,
+      action: PayloadAction<{ cartItemId: string; addOns: AddOn[]; quantity: number }>
+    ) => {
+      const { cartItemId, addOns, quantity } = action.payload;
+      const oldItem = state.items.find((i) => i.cartItemId === cartItemId);
+
+      if (oldItem) {
+        state.items = state.items.filter((i) => i.cartItemId !== cartItemId);
+
+        const newCartItemId = generateCartItemId(oldItem, addOns);
+        const existingItem = state.items.find((i) => i.cartItemId === newCartItemId);
+
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          const updatedItem: CartItem = {
+            ...oldItem,
+            addOns,
+            quantity,
+            cartItemId: newCartItemId,
+          };
+          state.items.push(updatedItem);
+        }
+
+        state.subtotal = calculateSubtotal(state.items);
+      }
+    },
   },
 });
 
@@ -75,7 +104,7 @@ function calculateSubtotal(items: CartItem[]): number {
   }, 0);
 }
 
-export const { addItem, removeItem, updateQuantity, clearCart } = cartSlice.actions;
+export const { addItem, removeItem, updateQuantity, clearCart, updateItem } = cartSlice.actions;
 export default cartSlice.reducer;
 
 export const selectCartItemCount = (state: { cart: CartState }) =>

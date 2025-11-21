@@ -19,12 +19,16 @@ const checkoutSlice = createSlice({
       const serviceCharge = subtotal * SERVICE_CHARGE_RATE;
       const total = subtotal + serviceCharge;
 
+      // Generate a random 12-digit order ID
+      const orderId = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+
       state.receipt = {
         items: cartState.items,
         subtotal,
         serviceCharge,
         total,
         timestamp: new Date().toISOString(),
+        orderId,
       };
     },
 

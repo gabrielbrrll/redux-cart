@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import type { TypedUseSelectorHook } from 'react-redux';
 import menuReducer from './menuSlice';
 import cartReducer from './cartSlice';
 import checkoutReducer from './checkoutSlice';

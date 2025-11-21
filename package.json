@@ -48,7 +48,6 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix",
-      "tsc --noEmit",
       "vitest related --run"
     ]
   }

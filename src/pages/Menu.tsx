@@ -11,7 +11,11 @@ import {
   IonSelectOption,
   IonItem,
   IonLabel,
+  IonButton,
+  IonText,
+  IonIcon,
 } from '@ionic/react';
+import { alertCircleOutline, refreshOutline } from 'ionicons/icons';
 import { useAppDispatch, useAppSelector } from '../store';
 import { fetchMenu, selectFilteredAndSortedItems, setSortBy } from '../store/menuSlice';
 import { MenuItem } from '../components/MenuItem';
@@ -36,7 +40,12 @@ export const MenuPage: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding ion-text-center">
-          <IonSpinner name="crescent" />
+          <div style={{ marginTop: '2rem' }}>
+            <IonSpinner name="crescent" color="primary" />
+            <IonText color="medium">
+              <p>Loading menu...</p>
+            </IonText>
+          </div>
         </IonContent>
       </IonPage>
     );
@@ -50,8 +59,25 @@ export const MenuPage: React.FC = () => {
             <IonTitle>Menu</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonContent className="ion-padding">
-          <p>Error: {error}</p>
+        <IonContent className="ion-padding ion-text-center">
+          <div style={{ marginTop: '2rem' }}>
+            <IonIcon
+              icon={alertCircleOutline}
+              style={{ fontSize: '64px' }}
+              color="danger"
+            />
+            <IonText color="danger">
+              <h2>Unable to Load Menu</h2>
+            </IonText>
+            <IonText color="medium">
+              <p>We're having trouble connecting to our servers. Please check your internet connection and try again.</p>
+              <p style={{ fontSize: '0.875rem', marginTop: '1rem' }}>{error}</p>
+            </IonText>
+            <IonButton onClick={() => dispatch(fetchMenu())}>
+              <IonIcon slot="start" icon={refreshOutline} />
+              Retry
+            </IonButton>
+          </div>
         </IonContent>
       </IonPage>
     );
@@ -79,11 +105,20 @@ export const MenuPage: React.FC = () => {
           </IonSelect>
         </IonItem>
 
-        <IonList>
-          {filteredItems.map((item) => (
-            <MenuItem key={item.id} item={item} />
-          ))}
-        </IonList>
+        {filteredItems.length === 0 ? (
+          <div className="ion-padding ion-text-center" style={{ marginTop: '2rem' }}>
+            <IonText color="medium">
+              <h3>No items found</h3>
+              <p>Try adjusting your search or filters</p>
+            </IonText>
+          </div>
+        ) : (
+          <IonList>
+            {filteredItems.map((item) => (
+              <MenuItem key={item.id} item={item} />
+            ))}
+          </IonList>
+        )}
       </IonContent>
     </IonPage>
   );

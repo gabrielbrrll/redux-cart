@@ -3,6 +3,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
 import { MenuPage } from './pages/Menu';
 import { CartPage } from './pages/Cart';
+import { CheckoutPage } from './pages/Checkout';
 
 import './App.css';
 
@@ -23,10 +24,7 @@ const App: React.FC = () => {
             <CartPage />
           </Route>
           <Route exact path="/checkout">
-            <div style={{ padding: '20px', textAlign: 'center' }}>
-              <h1>Checkout Page</h1>
-              <p>Checkout will be implemented here</p>
-            </div>
+            <CheckoutPage />
           </Route>
         </IonRouterOutlet>
       </IonReactRouter>

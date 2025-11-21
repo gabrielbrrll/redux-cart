@@ -2,6 +2,10 @@
 
 A lightweight shopping cart system with product catalog built with React, TypeScript, Redux Toolkit, and Ionic Framework.
 
+## Demo
+
+https://drive.google.com/file/d/1uHFCIJsVRAlxMIVFQIGrVb8wFIeSD5jD/view?usp=sharing
+
 ## 🚀 Quick Start
 
 ```bash

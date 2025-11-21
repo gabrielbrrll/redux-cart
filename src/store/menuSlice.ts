@@ -65,8 +65,8 @@ const initialState: MenuState = {
   items: [],
   loading: false,
   error: null,
-  searchQuery: '',
-  sortBy: 'name',
+  searchQuery: '', // Note: Could use local state; kept in Redux per assignment requirements
+  sortBy: 'name', // Note: Could use local state; kept in Redux per assignment requirements
 };
 
 const menuSlice = createSlice({

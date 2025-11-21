@@ -3,6 +3,8 @@ import type { CheckoutState, CartState } from '../types';
 
 const SERVICE_CHARGE_RATE = 0.1;
 
+// Note: Receipt state could live in Checkout page component as local state
+// Kept in Redux per assignment requirements to demonstrate state management
 const initialState: CheckoutState = {
   receipt: null,
 };
